@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String                @id @default(cuid()) @map("_id")
+  name                String
+  email               String                @unique
+  emailVerified       Boolean               @default(false)
+  image               String?
+  role                String                @default("user")
+  banned              Boolean               @default(false)
+  banReason           String?
+  banExpires          Int? /// Unix timestamp for ban expiration
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  sessions            Session[]
+  accounts            Account[]
+  walletPass          WalletPass[]
+  notificationHistory NotificationHistory[]
+}
+
+model Session {
+  id             String   @id @default(cuid()) @map("_id")
+  userId         String
+  token          String
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid()) @map("_id")
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Verification {
+  id         String   @id @default(cuid()) @map("_id")
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model WalletPass {
+  id                  String                    @id @default(cuid()) @map("_id")
+  type                PassType                  @default(loyaltyCard)
+  userId              String
+  url                 String?
+  name                String
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+  user                User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customization       WalletPassCustomization[]
+  notificationHistory NotificationHistory[]
+}
+
+model WalletPassCustomization {
+  id                String     @id @default(cuid()) @map("_id")
+  walletId          String
+  wallet            WalletPass @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  logoUrl           String
+  coverImgUrl       String
+  websiteUrl        String?
+  qrUrl             String?
+  qrText            String?
+  backgroundColor   String
+  textColor         String
+  notificationIcon  String?
+  notificationTitle String?
+  textFields        Json? // Stores array of text fields
+  linkModules       Json? // Stores array of link modules
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model NotificationHistory {
+  id        String     @id @default(cuid()) @map("_id")
+  passId    String // Reference to WalletPass
+  userId    String // Reference to User
+  message   String
+  sentAt    DateTime
+  createdAt DateTime   @default(now())
+  pass      WalletPass @relation(fields: [passId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum PassType {
+  loyaltyCard
+  eventTicket
+  giftCard
+  offerCard
+  flightCard
+}
