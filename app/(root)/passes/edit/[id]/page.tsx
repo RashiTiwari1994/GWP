@@ -1,6 +1,20 @@
 import PassForm from '@/components/passes/pass-form';
 import { getPass } from '@/actions/passes';
 import { PassData } from '@/types/types';
+import type { Prisma } from '@prisma/client';
+
+// Define type for the database model's customization item
+type DbCustomization = {
+  logoUrl: string;
+  coverImgUrl: string;
+  websiteUrl: string | null;
+  qrUrl: string | null;
+  qrText: string | null;
+  backgroundColor: string;
+  notificationTitle: string | null;
+  textFields: Prisma.JsonValue;
+  linkModules: Prisma.JsonValue;
+};
 
 export default async function PassEditor({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,7 +28,7 @@ export default async function PassEditor({ params }: { params: Promise<{ id: str
     type: pass.type,
     name: pass.name,
     url: pass.url,
-    customization: pass.customization.map((c) => ({
+    customization: pass.customization.map((c: DbCustomization) => ({
       logoUrl: c.logoUrl,
       coverImgUrl: c.coverImgUrl,
       websiteUrl: c.websiteUrl,
