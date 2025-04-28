@@ -1,7 +1,7 @@
 import PassForm from '@/components/passes/pass-form';
 import { getPass } from '@/actions/passes';
 import { PassData } from '@/types/types';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 // Define type for the database model's customization item
 type DbCustomization = {
