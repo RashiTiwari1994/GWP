@@ -1,7 +1,7 @@
 import PassForm from '@/components/passes/pass-form';
 import { getPass } from '@/actions/passes';
 import { PassData } from '@/types/types';
-import { Prisma } from '@prisma/client';
+import { JsonValue } from '@prisma/client/runtime/library';
 
 // Define type for the database model's customization item
 type DbCustomization = {
@@ -12,8 +12,8 @@ type DbCustomization = {
   qrText: string | null;
   backgroundColor: string;
   notificationTitle: string | null;
-  textFields: Prisma.JsonValue;
-  linkModules: Prisma.JsonValue;
+  textFields: JsonValue;
+  linkModules: JsonValue;
 };
 
 export default async function PassEditor({ params }: { params: Promise<{ id: string }> }) {
