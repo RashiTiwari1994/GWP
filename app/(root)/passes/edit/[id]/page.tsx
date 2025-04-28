@@ -1,6 +1,6 @@
 import PassForm from '@/components/passes/pass-form';
 import { getPass } from '@/actions/passes';
-import { PassData } from '@/types/types';
+import { PassData, PassCustomization } from '@/types/types';
 
 export default async function PassEditor({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,7 +14,7 @@ export default async function PassEditor({ params }: { params: Promise<{ id: str
     type: pass.type,
     name: pass.name,
     url: pass.url,
-    customization: pass.customization.map((c) => ({
+    customization: pass.customization.map((c: PassCustomization) => ({
       logoUrl: c.logoUrl,
       coverImgUrl: c.coverImgUrl,
       websiteUrl: c.websiteUrl,
